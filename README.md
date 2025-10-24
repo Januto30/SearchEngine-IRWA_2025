@@ -24,6 +24,7 @@ This subject explores techniques for retrieving and analyzing information from l
 Cleans and tokenizes a text string by:
 - Converting to lowercase  
 - Removing punctuation and stopwords  
+- Applying tokenization
 - Applying stemming  
 
 #### **`combine_product_details(details_list: list[dict]) -> str`**
