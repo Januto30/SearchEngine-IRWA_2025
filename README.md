@@ -10,9 +10,9 @@ This subject explores techniques for retrieving and analyzing information from l
 
 **Group Members:**
 
-Carla Núñez
-Julia Pérez
-Jan Prats
+- Carla Núñez
+- Julia Pérez
+- Jan Prats
 
 ---
 
