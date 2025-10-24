@@ -41,10 +41,12 @@ The goal of this step is to systematically clean and tokenize the textual conten
 
 **=== Original Product ===**  
 Title      : Solid Women Multicolor Track Pants
+
 Description: Yorker trackpants made from 100% rich combed cotton giving it a rich look.Designed for Comfort,Skin friendly fabric,itch-free waistband & great for all year round use Proudly made in India
 
 **=== After Preprocessing ===**  
 Title Tokens      : ['solid', 'women', 'multicolor', 'track', 'pant']
+
 Description Tokens: ['yorker', 'trackpant', 'made', '100', 'rich', 'comb', 'cotton', 'give', 'rich', 'look', 'design', 'comfort', 'skin', 'friendli', 'fabric', 'itch', 'free', 'waistband', 'great', 'year', 'round', 'use', 'proudli', 'made', 'india']
 
 ---
