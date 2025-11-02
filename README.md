@@ -50,9 +50,16 @@ All notebooks are designed for **Google Colab**, so no local setup is required.
 1. Open the corresponding notebook (`IRWA_2025_part_N.ipynb`) on GitHub.  
    - Click **"Open in Colab"** or copy the notebook link into [Colab](https://colab.research.google.com/).  
 2. Mount your Google Drive when prompted.  
-3. Verify that the dataset folder (`/data/`) is correctly located in your Drive or repository.  
-4. Run all cells sequentially (Runtime → Run all).  
-5. The notebook will automatically install any missing libraries at the beginning (using `!pip install ...`).  
+3. Verify that the dataset folder (`/data/`) is correctly located in your Drive or repository.
+
+   ⚠️ Important:
+      Paths to the data files (e.g., /content/drive/MyDrive/...) may vary depending on your personal Google Drive structure.
+      You might need to modify the path variables at the beginning of the notebook to point to your actual data location.
+      Example:
+      ``` DATA_PATH = "/content/drive/MyDrive/IRWA_2025/data/fashion_products_dataset.json"```
+
+6. Run all cells sequentially (Runtime → Run all).  
+7. The notebook will automatically install any missing libraries at the beginning (using `!pip install ...`).  
 
 Each notebook produces outputs (tables, visualizations, evaluation metrics) directly within the Colab environment.
 
