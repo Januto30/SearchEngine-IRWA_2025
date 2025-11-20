@@ -77,9 +77,6 @@ Prepare and analyze the dataset `fashion_products_dataset.json`.
 - Word frequency analysis and visualizations (WordClouds, histograms)  
 - Export preprocessed data for later parts  
 
-**Output:**  
-`preprocessed_fashion_products.csv` stored under `/data/`.
-
 ---
 
 ## 📗 Part 2 – Indexing & Evaluation
@@ -99,8 +96,21 @@ Evaluation metrics and retrieved document tables displayed in the notebook.
 
 ---
 
-## 📙 Part 3 – Ranking & Filtering *(to be added)*
- 
+## 📙 Part 3 – Ranking & Filtering 
+
+**Objective:**
+Experiment with different ranking algorithms to sort documents by relevance for conjunctive queries.
+
+**Main Steps:**
+- Implement three ranking methods:
+- TF-IDF + cosine similarity for classical term-based scoring
+- BM25 for probabilistic relevance scoring
+- Custom score combining relevance signals such as ratings, stock availability, price, and discounts
+- Apply word2vec + cosine similarity to represent queries and documents as averaged word vectors and rank accordingly
+- Compare ranking outcomes across methods and analyze their advantages and limitations
+
+**Output:**
+Top-k ranked documents per query, precision and recall metrics, and a comparison of ranking performance across TF-IDF, BM25, and the custom score.
 
 ---
 
