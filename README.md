@@ -35,7 +35,12 @@ SearchEngine-IRWA_2025/
 │ └── data/
 │   ├──  fashion_products_dataset.json
 │   └──  validation_labels.csv
-├── IRWA-2025-part-3/  #to be implemented
+├── IRWA-2025-part-3/
+│ ├── IRWA_2025_part_3.ipynb
+│ ├── IRWA-2025-u214970-u213927-u214026-part-3.pdf
+│ └── data/
+│   ├──  fashion_products_dataset.json
+│   └──  validation_labels.csv
 ├── IRWA-2025-part-4/  #to be implemented
 │
 └── README.md
