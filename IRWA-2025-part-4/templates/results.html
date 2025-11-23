@@ -3,22 +3,44 @@
 {% block content %}
     Found <strong>{{ found_counter }}</strong> results...
     <hr>
-    {% if rag_response %}
+    {% if rag_text %}
         <div class="mb-4 p-3" style="border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9;">
             <h5>AI-Generated Summary:</h5>
-            <p>{{ rag_response }}</p>
+            <pre style="white-space: pre-wrap;">{{ rag_text }}</pre>
+            {% if rag_reranked %}
+                <hr>
+                <h6>Reranked results (top {{ rag_reranked|length }}):</h6>
+                <ul>
+                    {% for r in rag_reranked %}
+                        <li><strong>{{ r.pid }}</strong> — {{ r.title }} (score: {{ '%.3f'|format(r.score) }})</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </div>
     {% endif %}
     <hr>
     {% for item in results_list %}
+        {% set doc = corpus.get(item.pid) %}
         <div class="pb-3">
             <div class="doc-title">
-                <a href="{{ item.url }}">{{ item.title }}...
+                <a href="{{ item.url }}">{{ doc.title if doc else item.title }}
                 </a>
             </div>
-            <div class="doc-desc">
-                {{ item.doc_date }} — {{ item.description }}
+            <div class="doc-meta small text-muted">
+                {% if doc %}
+                    <span><strong>Price:</strong> {{ doc.selling_price }}</span>
+                    {% if doc.discount %}<span> — <strong>Discount:</strong> {{ doc.discount }}%</span>{% endif %}
+                    {% if doc.average_rating %}<span> — <strong>Rating:</strong> {{ doc.average_rating }}/5</span>{% endif %}
+                {% else %}
+                    <span class="text-muted">No additional metadata</span>
+                {% endif %}
             </div>
+            <div class="doc-desc mt-1">
+                {{ doc.description if doc else item.description }}
+            </div>
+            {% if item.ranking is defined %}
+                <div class="doc-rank small text-muted">Score: {{ '%.4f'|format(item.ranking) }}</div>
+            {% endif %}
 
         </div>
 

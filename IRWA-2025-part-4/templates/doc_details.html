@@ -8,11 +8,33 @@
 <div><a href="/" >Home</a></div>
 <div><a href="/stats" >Stats</a></div>
 <div><a href="/dashboard" >Dashboard</a></div>
-<h1>Document Detail Page</h1>
-<p>This is a placeholder for document details.</p>
-<p>Here you can display more information about the document.</p>
-<p>For example, you might show the full text of the document, metadata, or other relevant details.</p>
-<p>You can also include links to related documents or resources.</p>
-<p>Feel free to customize this page to fit the needs of your application.</p>
+<h1>Document Detail</h1>
+{% if doc %}
+    <h2>{{ doc.title }}</h2>
+    {% if doc.images %}
+        <div>
+            {% for img in doc.images %}
+                <img src="{{ img }}" alt="{{ doc.title }}" style="max-width:200px; margin-right:8px;"/>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <p><strong>Price:</strong> {{ doc.selling_price }} {% if doc.discount %}(Discount: {{ doc.discount }}%) {% endif %}</p>
+    <p><strong>Rating:</strong> {{ doc.average_rating }}</p>
+    <h3>Description</h3>
+    <p>{{ doc.description }}</p>
+    <h3>Product Details</h3>
+    {% if doc.product_details %}
+        <ul>
+        {% for k,v in doc.product_details.items() %}
+            <li><strong>{{ k }}:</strong> {{ v }}</li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No additional product details available.</p>
+    {% endif %}
+    <p><a href="{{ doc.url }}">Original product link</a></p>
+{% else %}
+    <p>Document not found.</p>
+{% endif %}
 </body>
 </html>

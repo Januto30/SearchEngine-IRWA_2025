@@ -80,12 +80,29 @@ def search_form_post():
     rag_response = rag_generator.generate_response(search_query, results)
     print("RAG response:", rag_response)
 
+    # Support both legacy string response and new structured dict response
+    if isinstance(rag_response, dict):
+        rag_text = rag_response.get('answer')
+        rag_reranked = rag_response.get('reranked_results')
+    else:
+        rag_text = rag_response
+        rag_reranked = None
+
     found_count = len(results)
     session['last_found_count'] = found_count
 
     print(session)
 
-    return render_template('results.html', results_list=results, page_title="Results", found_counter=found_count, rag_response=rag_response)
+    return render_template(
+        'results.html',
+        results_list=results,
+        page_title="Results",
+        found_counter=found_count,
+        rag_response=rag_response,
+        rag_text=rag_text,
+        rag_reranked=rag_reranked,
+        corpus=corpus,
+    )
 
 
 @app.route('/doc_details', methods=['GET'])
