@@ -3,38 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <title>Document Detail - IRWA Search Engine</title>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #df8c95, #c96b75);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .doc-container {
+            width: 100%;
+            max-width: 850px;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 28px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .back-links {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .back-links a {
+            margin: 0 8px;
+            color: #c96b75;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .back-links a:hover {
+            color: #c96b75;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: #2f2e2e;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            color: #2f2e2e;
+        }
+
+        p {
+            color: #475569;
+            line-height: 1.55;
+            margin-bottom: 10px;
+        }
+
+        strong {
+            color: #2f2e2e;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+
+        li {
+            margin-bottom: 8px;
+            color: #2f2e2e;
+        }
+
+        .product-images {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .product-images img {
+            max-width: 180px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+            transition: transform 0.3s ease;
+        }
+
+        .product-images img:hover {
+            transform: scale(1.03);
+        }
+
+        .product-link {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .product-link a {
+            display: inline-block;
+            padding: 12px 26px;
+            background: linear-gradient(135deg, #df8c95, #c96b75);
+            color: #2f2e2e;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+        }
+    </style>
 </head>
 <body>
-<div><a href="/" >Home</a></div>
-<div><a href="/stats" >Stats</a></div>
-<div><a href="/dashboard" >Dashboard</a></div>
-<h1>Document Detail</h1>
-{% if doc %}
-    <h2>{{ doc.title }}</h2>
-    {% if doc.images %}
-        <div>
-            {% for img in doc.images %}
-                <img src="{{ img }}" alt="{{ doc.title }}" style="max-width:200px; margin-right:8px;"/>
-            {% endfor %}
+    <div class="doc-container">
+        <div class="back-links">
+            <a href="/">Home</a> | 
+            <a href="/stats">Stats</a> | 
+            <a href="/dashboard">Dashboard</a>
         </div>
-    {% endif %}
-    <p><strong>Price:</strong> {{ doc.selling_price }} {% if doc.discount %}(Discount: {{ doc.discount }}%) {% endif %}</p>
-    <p><strong>Rating:</strong> {{ doc.average_rating }}</p>
-    <h3>Description</h3>
-    <p>{{ doc.description }}</p>
-    <h3>Product Details</h3>
-    {% if doc.product_details %}
-        <ul>
-        {% for k,v in doc.product_details.items() %}
-            <li><strong>{{ k }}:</strong> {{ v }}</li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>No additional product details available.</p>
-    {% endif %}
-    <p><a href="{{ doc.url }}">Original product link</a></p>
-{% else %}
-    <p>Document not found.</p>
-{% endif %}
+
+        {% if doc %}
+            <h1>{{ doc.title }}</h1>
+
+            {% if doc.images %}
+                <div class="product-images">
+                    {% for img in doc.images %}
+                        <img src="{{ img }}" alt="{{ doc.title }}">
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <p><strong>Price:</strong> {{ doc.selling_price }} {% if doc.discount %}(Discount: {{ doc.discount }}%) {% endif %}</p>
+            <p><strong>Rating:</strong> {{ doc.average_rating }}</p>
+
+            <h3>Description</h3>
+            <p>{{ doc.description }}</p>
+
+            <h3>Product Details</h3>
+            {% if doc.product_details %}
+                <ul>
+                    {% for k, v in doc.product_details.items() %}
+                        <li><strong>{{ k }}:</strong> {{ v }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No additional product details available.</p>
+            {% endif %}
+
+            <div class="product-link">
+                <a href="{{ doc.url }}">Original product link</a>
+            </div>
+
+        {% else %}
+            <p>Document not found.</p>
+        {% endif %}
+    </div>
 </body>
 </html>

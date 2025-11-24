@@ -1,15 +1,62 @@
 {% extends "base.html" %}
 {% block page_title %}{{ page_title }}{% endblock %}
 {% block content %}
-    <h2>Quick Stats</h2>
-    <h4>Clicked docs:</h4>
 
-    {% for doc in clicks_data %}
-        <div class="pb-3">
-            <div class="">
-                <span class="text-dark"> ({{ doc.count }} visits) </span> — id: {{ doc.pid }} — {{ doc.title }} - {{ doc.description }}
+<h2 style="color: #2f2e2e; font-weight: 700; margin-bottom: 20px;">
+    Quick Stats
+</h2>
+
+<h4 style="color: #4b4545; font-weight: 600; margin-bottom: 25px;">
+    Clicked Documents
+</h4>
+
+{% if clicks_data %}
+    <div class="list-group">
+        {% for doc in clicks_data %}
+            <div class="list-group-item mb-4"
+                 style="
+                    background: #ffffff;
+                    border-radius: 24px;
+                    padding: 24px;
+                    border: 1px solid #e2e8f0;
+                    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+                 "
+            >
+
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 style="margin: 0; color: #2f2e2e; font-weight: 600;">
+                        {{ doc.title }}
+                    </h5>
+
+                    <span style="
+                        background: linear-gradient(135deg, #df8c95, #c96b75);
+                        color: #2f2e2e;
+                        padding: 6px 16px;
+                        border-radius: 30px;
+                        font-size: 0.85rem;
+                        font-weight: 600;
+                        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+                    ">
+                        {{ doc.count }} visits
+                    </span>
+                </div>
+
+                <p class="mb-1" style="color: #4b5563;">
+                    <strong style="color:#2f2e2e;">ID:</strong> {{ doc.pid }}
+                </p>
+
+                <p class="mb-0" style="color: #6b7280; line-height: 1.55;">
+                    {{ doc.description }}
+                </p>
+
             </div>
-        </div>
-        <hr>
-    {% endfor %}
+        {% endfor %}
+    </div>
+
+{% else %}
+    <p style="color: #b0b4bb; font-style: italic;">
+        No data available for clicked documents.
+    </p>
+{% endif %}
+
 {% endblock %}

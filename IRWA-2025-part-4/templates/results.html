@@ -1,49 +1,72 @@
 {% extends "base.html" %}
 {% block page_title %}{{ page_title }}{% endblock %}
 {% block content %}
+
+<style>
+    body {
+        background: linear-gradient(135deg, #df8c95, #c96b75);
+    }
+</style>
+
+<div class="text-center mb-4" style="color: #2f2e2e; font-size: 1.15rem; font-weight: 600;">
     Found <strong>{{ found_counter }}</strong> results...
-    <hr>
-    {% if rag_text %}
-        <div class="mb-4 p-3" style="border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9;">
-            <h5>AI-Generated Summary:</h5>
-            <pre style="white-space: pre-wrap;">{{ rag_text }}</pre>
-            {% if rag_reranked %}
-                <hr>
-                <h6>Reranked results (top {{ rag_reranked|length }}):</h6>
-                <ul>
-                    {% for r in rag_reranked %}
-                        <li><strong>{{ r.pid }}</strong> — {{ r.title }} (score: {{ '%.3f'|format(r.score) }})</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
+</div>
+
+<hr class="my-6" style="border-top: 1px solid rgba(255,255,255,0.4);">
+
+{% if rag_text %}
+<div class="mb-5 p-4" style="border: 1px solid rgba(0,0,0,0.08); border-radius: 20px; background: #fff4f4; box-shadow: 0 4px 12px rgba(0,0,0,0.10);">
+    <h5 class="mb-3" style="font-weight: 600; color: #2f2e2e;">AI-Generated Summary</h5>
+    <pre style="white-space: pre-wrap; background: #ffffff; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: inset 0 1px 4px rgba(0,0,0,0.04);">{{ rag_text }}</pre>
+
+    {% if rag_reranked %}
+        <hr class="my-4" style="border-top: 1px solid #e5c3c8;">
+        <h6 class="mb-2" style="color: #5b4b4c; font-weight: 600;">Reranked results (top {{ rag_reranked|length }}):</h6>
+        <ul style="padding-left: 20px; color: #5b4b4c;">
+            {% for r in rag_reranked %}
+                <li class="mb-1"><strong>{{ r.pid }}</strong> — {{ r.title }} <span style="color: #7e6d6f;">(score: {{ '%.3f'|format(r.score) }})</span></li>
+            {% endfor %}
+        </ul>
     {% endif %}
-    <hr>
-    {% for item in results_list %}
-        {% set doc = corpus.get(item.pid) %}
-        <div class="pb-3">
-            <div class="doc-title">
-                <a href="{{ item.url }}">{{ doc.title if doc else item.title }}
-                </a>
-            </div>
-            <div class="doc-meta small text-muted">
-                {% if doc %}
-                    <span><strong>Price:</strong> {{ doc.selling_price }}</span>
-                    {% if doc.discount %}<span> — <strong>Discount:</strong> {{ doc.discount }}%</span>{% endif %}
-                    {% if doc.average_rating %}<span> — <strong>Rating:</strong> {{ doc.average_rating }}/5</span>{% endif %}
-                {% else %}
-                    <span class="text-muted">No additional metadata</span>
-                {% endif %}
-            </div>
-            <div class="doc-desc mt-1">
-                {{ doc.description if doc else item.description }}
-            </div>
-            {% if item.ranking is defined %}
-                <div class="doc-rank small text-muted">Score: {{ '%.4f'|format(item.ranking) }}</div>
-            {% endif %}
+</div>
+{% endif %}
 
+<hr class="my-6" style="border-top: 1px solid rgba(255,255,255,0.4);">
+
+{% for item in results_list %}
+    {% set doc = corpus.get(item.pid) %}
+
+    <div class="p-4 mb-4" style="background: #ffffff; border-radius: 22px; box-shadow: 0 6px 16px rgba(0,0,0,0.10); border: 1px solid #e8c8cb; transition: transform 0.25s ease;">
+
+        <div class="doc-title mb-1" style="font-size: 1.15rem; font-weight: 600;">
+            <a href="{{ item.url }}" style="color: #2f2e2e; text-decoration: none;">
+                {{ doc.title if doc else item.title }}
+            </a>
         </div>
 
-    {% endfor %}
-{% endblock %}
+        <div class="doc-meta small mb-2" style="color: #766264;">
+            {% if doc %}
+                <span><strong>Price:</strong> {{ doc.selling_price }}</span>
+                {% if doc.discount %}
+                    <span> — <strong>Discount:</strong> {{ doc.discount }}%</span>
+                {% endif %}
+                {% if doc.average_rating %}
+                    <span> — <strong>Rating:</strong> {{ doc.average_rating }}/5</span>
+                {% endif %}
+            {% else %}
+                <span style="color: #9f8d8f;">No additional metadata</span>
+            {% endif %}
+        </div>
 
+        <div class="doc-desc mb-2" style="color: #2f2e2e; line-height: 1.45;">
+            {{ doc.description if doc else item.description }}
+        </div>
+
+        {% if item.ranking is defined %}
+            <div class="doc-rank small" style="color: #b39a9c;">Score: {{ '%.4f'|format(item.ranking) }}</div>
+        {% endif %}
+
+    </div>
+{% endfor %}
+
+{% endblock %}

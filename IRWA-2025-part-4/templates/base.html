@@ -2,28 +2,127 @@
 <html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {# Using Bootstrap v4.6.1 #}
     <link rel="stylesheet" href="{{ url_for('static',filename='styles/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static',filename='styles/custom.css') }}">
     <title>{% block page_title %}{% endblock %} - IRWA Search Engine</title>
     {% block header %}{% endblock %}
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #df8c95, #c96b75);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 40px 50px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 650px;
+            width: 100%;
+            text-align: center;
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+
+        .header img {
+            width: 90px;
+            margin-bottom: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .header img:hover {
+            transform: scale(1.05);
+        }
+
+        .header span {
+            display: block;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .content {
+            margin-top: 30px;
+        }
+
+        .search-container {
+            margin-top: 20px;
+        }
+
+        .search-container input[type="text"] {
+            width: 100%;
+            padding: 14px 20px;
+            font-size: 17px;
+            border: 1px solid #cbd5e1;
+            border-radius: 30px;
+            background: #f8fafc;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .search-container input[type="text"]:focus {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            background: #ffffff;
+        }
+
+        .search-container button {
+            margin-top: 15px;
+            padding: 12px 30px;
+            font-size: 17px;
+            font-weight: 500;
+            color: #fff;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .search-container button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+        }
+
+        hr {
+            margin: 40px 0 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .centered {
+            font-size: 0.95rem;
+            color: #64748b;
+            margin-top: 10px;
+            letter-spacing: 0.4px;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
-    <div class='header text-center'>
+    <div class="header text-center">
         <a href="/">
-            <img src="{{ url_for('static', filename='logo.png') }}" width="100" alt="UPF logo"/>
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="UPF logo" />
         </a>
-        <span> IRWA Search Engine </span>
+        <span>IRWA Search Engine</span>
     </div>
-    <hr>
-    <div class='content'>
+
+    <div class="content">
         {% block content %}
             base
         {% endblock %}
     </div>
+
     <hr>
-    <div class='centered'>Information Retrieval and Web Analytics</div>
+    <div class="centered">Information Retrieval and Web Analytics</div>
 </div>
 </body>
 </html>

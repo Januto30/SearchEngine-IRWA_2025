@@ -109,22 +109,22 @@ def search_form_post():
 def doc_details():
     """
     Show document details page
-    ### Replace with your custom logic ###
     """
-
-    # getting request parameters:
-    # user = request.args.get('user')
     print("doc details session: ")
     print(session)
 
-    res = session["some_var"]
-    print("recovered var from session:", res)
-
-    # get the query string parameters from request
-    clicked_doc_id = request.args["pid"]
+    # Get the clicked document ID from the query string
+    clicked_doc_id = request.args.get("pid")
     print("click in id={}".format(clicked_doc_id))
 
-    # store data in statistics table 1
+    # Retrieve the document from the corpus
+    doc = corpus.get(clicked_doc_id)
+
+    if not doc:
+        print(f"Document with id {clicked_doc_id} not found in corpus.")
+        return render_template('doc_details.html', doc=None)
+
+    # Update analytics data for the clicked document
     if clicked_doc_id in analytics_data.fact_clicks.keys():
         analytics_data.fact_clicks[clicked_doc_id] += 1
     else:
@@ -132,8 +132,9 @@ def doc_details():
 
     print("fact_clicks count for id={} is {}".format(clicked_doc_id, analytics_data.fact_clicks[clicked_doc_id]))
     print(analytics_data.fact_clicks)
-    return render_template('doc_details.html')
 
+    # Render the template with the document details
+    return render_template('doc_details.html', doc=doc)
 
 @app.route('/stats', methods=['GET'])
 def stats():
