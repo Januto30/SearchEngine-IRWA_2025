@@ -75,6 +75,11 @@ def search_form_post():
     search_id = analytics_data.save_query_terms(search_query)
 
     results = search_engine.search(search_query, search_id, corpus)
+    # store the returned result list so we can link clicks to positions
+    try:
+        analytics_data.save_search_results(search_id, results)
+    except Exception as e:
+        print(f"Warning saving search results for analytics: {e}")
 
     # generate RAG response based on user query and retrieved results
     rag_response = rag_generator.generate_response(search_query, results)
@@ -124,11 +129,16 @@ def doc_details():
         print(f"Document with id {clicked_doc_id} not found in corpus.")
         return render_template('doc_details.html', doc=None)
 
-    # Update analytics data for the clicked document
-    if clicked_doc_id in analytics_data.fact_clicks.keys():
-        analytics_data.fact_clicks[clicked_doc_id] += 1
-    else:
-        analytics_data.fact_clicks[clicked_doc_id] = 1
+    # Record the click via analytics helper (captures user agent and IP)
+    search_id = request.args.get('search_id')
+    user_agent = request.headers.get('User-Agent')
+    remote_addr = request.remote_addr
+    try:
+        analytics_data.record_click(clicked_doc_id, search_id=int(search_id) if search_id else None,
+                                    user_agent=user_agent, remote_addr=remote_addr)
+    except Exception:
+        # fallback: increment the simple counter
+        analytics_data.fact_clicks[clicked_doc_id] = analytics_data.fact_clicks.get(clicked_doc_id, 0) + 1
 
     print("fact_clicks count for id={} is {}".format(clicked_doc_id, analytics_data.fact_clicks[clicked_doc_id]))
     print(analytics_data.fact_clicks)
@@ -153,6 +163,36 @@ def stats():
     # simulate sort by ranking
     docs.sort(key=lambda doc: doc.count, reverse=True)
     return render_template('stats.html', clicks_data=docs)
+
+
+@app.route('/analytics/top_clicked', methods=['GET'])
+def analytics_top_clicked():
+    data = analytics_data.get_top_clicked(n=20)
+    return {"top_clicked": data}
+
+
+@app.route('/analytics/top_queries', methods=['GET'])
+def analytics_top_queries():
+    data = analytics_data.get_top_queries(n=20)
+    return {"top_queries": data}
+
+
+@app.route('/analytics/top_terms', methods=['GET'])
+def analytics_top_terms():
+    data = analytics_data.get_top_terms(n=50)
+    return {"top_terms": data}
+
+
+@app.route('/analytics/browsers', methods=['GET'])
+def analytics_browsers():
+    data = analytics_data.get_browser_stats()
+    return {"browsers": data}
+
+
+@app.route('/analytics/ips', methods=['GET'])
+def analytics_ips():
+    data = analytics_data.get_ip_stats()
+    return {"ips": data}
 
 
 @app.route('/dashboard', methods=['GET'])

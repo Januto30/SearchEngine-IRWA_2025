@@ -2,6 +2,8 @@ import json
 import random
 import altair as alt
 import pandas as pd
+import httpagentparser
+from collections import Counter
 
 
 class AnalyticsData:
@@ -59,8 +61,52 @@ class AnalyticsData:
         # Render the chart to HTML
         return chart.to_html()
 
+    # Return top queries by frequency
+    def get_top_queries(self, n=10):
+        counts = Counter()
+        for sid, v in self.queries.items():
+            terms = v.get('terms')
+            if terms:
+                counts[terms] += 1
+        return [{'query': q, 'count': c} for q, c in counts.most_common(n)]
+
+    # Return top individual terms across saved queries
+    def get_top_terms(self, n=20):
+        counts = Counter()
+        for sid, v in self.queries.items():
+            terms = v.get('terms')
+            if not terms:
+                continue
+            toks = [t for t in terms.lower().split() if len(t) > 1]
+            counts.update(toks)
+        return [{'term': t, 'count': c} for t, c in counts.most_common(n)]
+
+    # Return counts per browser parsed from click_events user_agent
+    def get_browser_stats(self):
+        counts = Counter()
+        for ev in self.click_events:
+            ua = ev.get('user_agent')
+            if not ua:
+                counts['unknown'] += 1
+                continue
+            try:
+                info = httpagentparser.detect(ua)
+                browser = info.get('browser', {}).get('name') or info.get('browser') or 'unknown'
+            except Exception:
+                browser = 'unknown'
+            counts[browser] += 1
+        return [{'browser': b, 'count': c} for b, c in counts.most_common()]
+
+    # Return counts per remote IP (city requires GeoIP integration)
+    def get_ip_stats(self):
+        counts = Counter()
+        for ev in self.click_events:
+            ip = ev.get('remote_addr') or 'unknown'
+            counts[ip] += 1
+        return [{'ip': ip, 'count': c} for ip, c in counts.most_common()]
+
+    # Record a click event and increment counters. Attempts to enrich with rank/position if available
     def record_click(self, pid: str, search_id: int = None, user_agent: str = None, remote_addr: str = None, timestamp=None):
-        """Record a click event and increment counters. Attempts to enrich with rank/position if available."""
         if timestamp is None:
             timestamp = pd.Timestamp.utcnow()
 

@@ -21,9 +21,134 @@
     - etc.
 
     -->
-
+    <!-- Giving format to the charts displayed in the Dashboard -->
     <h3>Dashboard</h3>
-    <iframe src="/plot_number_of_views" width="600" height="400" style="border: none;"></iframe>
+    <p style="color: #4b4545; max-width: 800px;">This panel shows key indicators about the use of the site and the search engine. Each chart includes a brief explanation of what it represents.</p>
+
+    <div style="display: flex; gap: 24px; flex-wrap: wrap; margin-top: 20px;">
+        <div style="flex: 1 1 480px; background: #fff; padding: 18px; border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.06);">
+            <h5 style="margin-top:0;">Ranking of visited documents (from results page)</h5>
+            <div class="chart-container" style="height:300px;">
+                <canvas id="chartTopClicked" style="width:100%; height:100%;"></canvas>
+            </div>
+            <p style="font-size:0.9rem; color:#6b7280;">Ranking of documents by number of clicks from the results page. Useful to see which products attract the most interest.</p>
+            <div id="topClickedPlaceholder" style="color:#9aa0a6; font-size:0.95rem; display:none;">No data on clicks yet.</div>
+        </div>
+
+        <div style="flex: 1 1 300px; background: #fff; padding: 18px; border-radius: 12px; box-shadow: 0 6px 18px rgba(0,0,0,0.06);">
+            <h5 style="margin-top:0;">Visitor's preferred browsers</h5>
+            <div class="chart-container" style="height:550px;">
+                <canvas id="chartBrowsers" style="width:100%; height:100%;"></canvas>
+            </div>
+            <p style="font-size:0.9rem; color:#6b7280;">Distribution of browsers determined from the User-Agent header of clicks.</p>
+            <div id="browsersPlaceholder" style="color:#9aa0a6; font-size:0.95rem; display:none;">No browser data yet.</div>
+        </div>
+    </div>
+
+    <div style="display:flex; gap:24px; flex-wrap:wrap; margin-top:20px;">
+        <div style="flex: 1 1 480px; background:#fff; padding:18px; border-radius:12px; box-shadow: 0 6px 18px rgba(0,0,0,0.06);">
+            <h5 style="margin-top:0;">Preferred queries ranking</h5>
+            <div class="chart-container" style="height:300px;">
+                <canvas id="chartTopQueries" style="width:100%; height:100%;"></canvas>
+            </div>
+            <p style="font-size:0.9rem; color:#6b7280;">Saved search queries (most repeated). This helps understand what users are looking for.</p>
+            <div id="topQueriesPlaceholder" style="color:#9aa0a6; font-size:0.95rem; display:none;">No query data yet.</div>
+        </div>
+
+        <div style="flex: 1 1 300px; background:#fff; padding:18px; border-radius:12px; box-shadow: 0 6px 18px rgba(0,0,0,0.06);">
+            <h5 style="margin-top:0;">Preferred terms</h5>
+            <div class="chart-container" style="height:260px;">
+                <canvas id="chartTopTerms" style="width:100%; height:100%;"></canvas>
+            </div>
+            <p style="font-size:0.9rem; color:#6b7280;">Individual terms extracted from queries. Useful to detect trends or relevant synonyms.</p>
+            <div id="topTermsPlaceholder" style="color:#9aa0a6; font-size:0.95rem; display:none;">No term data yet.</div>
+        </div>
+    </div>
+
+    <div style="margin-top:20px; background:#fff; padding:18px; border-radius:12px; box-shadow: 0 6px 18px rgba(0,0,0,0.06);">
+        <h5 style="margin-top:0;">Visitor's IPs (proxy for city)</h5>
+        <p style="font-size:0.9rem; color:#6b7280;">List of IPs from which clicks were made. Mapping to cities requires integrating GeoIP (not active by default).</p>
+        <table class="table table-sm" style="width:100%; margin-top:12px;">
+            <thead>
+                <tr><th>IP</th><th>Clicks</th></tr>
+            </thead>
+            <tbody id="ipTableBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        // helper to render horizontal bar chart for top clicked/docs
+        async function fetchJson(path){
+            const r = await fetch(path);
+            return r.json();
+        }
+
+        // Top clicked (limit to top 20)
+        (async function(){
+            const data = await fetchJson('/analytics/top_clicked');
+            const rows = (data.top_clicked || []).slice(0, 20);
+            const placeholder = document.getElementById('topClickedPlaceholder');
+            if (!rows.length) { placeholder.style.display = 'block'; return; }
+            const labels = rows.map(r => r.pid);
+            const values = rows.map(r => r.count);
+            const ctx = document.getElementById('chartTopClicked').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: { labels, datasets: [{ label: 'Clicks', data: values, backgroundColor: '#c96b75' }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: true }
+            });
+        })();
+
+        // Browsers pie
+        (async function(){
+            const data = await fetchJson('/analytics/browsers');
+            const rows = data.browsers || [];
+            const placeholder = document.getElementById('browsersPlaceholder');
+            if (!rows.length) { placeholder.style.display = 'block'; return; }
+            const labels = rows.map(r => r.browser);
+            const values = rows.map(r => r.count);
+            const colors = labels.map((_,i)=>['#df8c95','#c96b75','#f2c1c6','#a8d5e2','#b5e7a0'][i%5]);
+            const ctx = document.getElementById('chartBrowsers').getContext('2d');
+            new Chart(ctx, { type: 'pie', data: { labels, datasets: [{ data: values, backgroundColor: colors }] }, options: { responsive:true, maintainAspectRatio:true } });
+        })();
+
+        // Top queries (limit to top 20)
+        (async function(){
+            const data = await fetchJson('/analytics/top_queries');
+            const rows = (data.top_queries || []).slice(0, 20);
+            const placeholder = document.getElementById('topQueriesPlaceholder');
+            if (!rows.length) { placeholder.style.display = 'block'; return; }
+            const labels = rows.map(r => r.query);
+            const values = rows.map(r => r.count);
+            const ctx = document.getElementById('chartTopQueries').getContext('2d');
+            new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: 'Frequency', data: values, backgroundColor: '#df8c95' }] }, options: { responsive:true, maintainAspectRatio:true } });
+        })();
+
+        // Top terms (limit to top 12)
+        (async function(){
+            const data = await fetchJson('/analytics/top_terms');
+            const rows = (data.top_terms || []).slice(0, 12);
+            const placeholder = document.getElementById('topTermsPlaceholder');
+            if (!rows.length) { placeholder.style.display = 'block'; return; }
+            const labels = rows.map(r => r.term);
+            const values = rows.map(r => r.count);
+            const ctx = document.getElementById('chartTopTerms').getContext('2d');
+            new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: 'Count', data: values, backgroundColor: '#c96b75' }] }, options: { responsive:true, maintainAspectRatio:true } });
+        })();
+
+        // IP table
+        (async function(){
+            const data = await fetchJson('/analytics/ips');
+            const rows = data.ips || [];
+            const tbody = document.getElementById('ipTableBody');
+            rows.slice(0,50).forEach(r => {
+                const tr = document.createElement('tr');
+                const tdIp = document.createElement('td'); tdIp.textContent = r.ip;
+                const tdCount = document.createElement('td'); tdCount.textContent = r.count;
+                tr.appendChild(tdIp); tr.appendChild(tdCount); tbody.appendChild(tr);
+            });
+        })();
+    </script>
 
 
 {% endblock %}
