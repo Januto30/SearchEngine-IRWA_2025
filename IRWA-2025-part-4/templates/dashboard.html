@@ -70,7 +70,7 @@
         <p style="font-size:0.9rem; color:#6b7280;">List of IPs from which clicks were made. Mapping to cities requires integrating GeoIP (not active by default).</p>
         <table class="table table-sm" style="width:100%; margin-top:12px;">
             <thead>
-                <tr><th>IP</th><th>Clicks</th></tr>
+                <tr><th>IP</th><th>City</th><th>Country</th><th>Clicks</th></tr>
             </thead>
             <tbody id="ipTableBody"></tbody>
         </table>
@@ -94,7 +94,7 @@
             const ctx = document.getElementById('chartTopClicked').getContext('2d');
             new Chart(ctx, {
                 type: 'bar',
-                data: { labels, datasets: [{ label: 'Clicks', data: values, backgroundColor: '#c96b75' }] },
+                data: { labels, datasets: [{ label: 'Clicks', data: values, backgroundColor: '#9f1e36' }] },
                 options: { indexAxis: 'y', responsive: true, maintainAspectRatio: true }
             });
         })();
@@ -107,7 +107,7 @@
             if (!rows.length) { placeholder.style.display = 'block'; return; }
             const labels = rows.map(r => r.browser);
             const values = rows.map(r => r.count);
-            const colors = labels.map((_,i)=>['#df8c95','#c96b75','#f2c1c6','#a8d5e2','#b5e7a0'][i%5]);
+            const colors = labels.map((_,i)=>['#9f1e36','#c96b75','#f2c1c6','#a8d5e2','#b5e7a0'][i%5]);
             const ctx = document.getElementById('chartBrowsers').getContext('2d');
             new Chart(ctx, { type: 'pie', data: { labels, datasets: [{ data: values, backgroundColor: colors }] }, options: { responsive:true, maintainAspectRatio:true } });
         })();
@@ -121,7 +121,7 @@
             const labels = rows.map(r => r.query);
             const values = rows.map(r => r.count);
             const ctx = document.getElementById('chartTopQueries').getContext('2d');
-            new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: 'Frequency', data: values, backgroundColor: '#df8c95' }] }, options: { responsive:true, maintainAspectRatio:true } });
+            new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: 'Frequency', data: values, backgroundColor: '#9f1e36' }] }, options: { responsive:true, maintainAspectRatio:true } });
         })();
 
         // Top terms (limit to top 12)
@@ -133,7 +133,7 @@
             const labels = rows.map(r => r.term);
             const values = rows.map(r => r.count);
             const ctx = document.getElementById('chartTopTerms').getContext('2d');
-            new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: 'Count', data: values, backgroundColor: '#c96b75' }] }, options: { responsive:true, maintainAspectRatio:true } });
+            new Chart(ctx, { type: 'bar', data: { labels, datasets: [{ label: 'Count', data: values, backgroundColor: '#9f1e36' }] }, options: { responsive:true, maintainAspectRatio:true } });
         })();
 
         // IP table
@@ -144,8 +144,10 @@
             rows.slice(0,50).forEach(r => {
                 const tr = document.createElement('tr');
                 const tdIp = document.createElement('td'); tdIp.textContent = r.ip;
-                const tdCount = document.createElement('td'); tdCount.textContent = r.count;
-                tr.appendChild(tdIp); tr.appendChild(tdCount); tbody.appendChild(tr);
+                const tdCity = document.createElement('td'); tdCity.textContent = r.city || '-';
+                const tdCountry = document.createElement('td'); tdCountry.textContent = r.country || '-';
+                const tdCount = document.createElement('td'); tdCount.textContent = parseInt(r.count) || 0;
+                tr.appendChild(tdIp); tr.appendChild(tdCity); tr.appendChild(tdCountry); tr.appendChild(tdCount); tbody.appendChild(tr);
             });
         })();
     </script>

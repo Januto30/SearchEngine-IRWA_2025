@@ -1,9 +1,18 @@
 import json
+import os
 import random
 import altair as alt
 import pandas as pd
 import httpagentparser
 from collections import Counter
+
+# geoip2 is optional; we import lazily and handle absence gracefully
+_HAS_GEOIP2 = False
+try:
+    import geoip2.database  # type: ignore
+    _HAS_GEOIP2 = True
+except Exception:
+    _HAS_GEOIP2 = False
 
 
 class AnalyticsData:
@@ -22,6 +31,10 @@ class AnalyticsData:
         self.search_results = {}
         self.fact_clicks = {}
         self.click_events = []
+        # optional GeoIP reader (lazy init) and cache for IP lookups
+        self._geo_reader = None
+        self._geo_db_path = os.getenv('GEOIP_DB_PATH', 'GeoLite2-City.mmdb')
+        self._ip_lookup_cache = {}
 
     def save_query_terms(self, terms: str) -> int:
         """Save the query and return a search_id."""
@@ -97,13 +110,79 @@ class AnalyticsData:
             counts[browser] += 1
         return [{'browser': b, 'count': c} for b, c in counts.most_common()]
 
-    # Return counts per remote IP (city requires GeoIP integration)
+    # Return counts per remote IP (city required GeoIP integration)
     def get_ip_stats(self):
         counts = Counter()
         for ev in self.click_events:
             ip = ev.get('remote_addr') or 'unknown'
             counts[ip] += 1
-        return [{'ip': ip, 'count': c} for ip, c in counts.most_common()]
+
+        results = []
+        for ip, c in counts.most_common():
+            info = self._resolve_ip_to_location(ip)
+            row = {'ip': ip, 'count': c}
+            if info:
+                row.update(info)
+            results.append(row)
+        return results
+
+    def _init_geo_reader(self):
+        if not _HAS_GEOIP2:
+            return None
+        if self._geo_reader:
+            return self._geo_reader
+        # try to open the database file
+        db_path = self._geo_db_path
+        try:
+            if not os.path.isabs(db_path):
+                # check common locations relative to project root
+                candidates = [db_path, os.path.join('/usr/local/share/GeoIP', db_path), os.path.join('/usr/share/GeoIP', db_path)]
+            else:
+                candidates = [db_path]
+            for p in candidates:
+                if os.path.exists(p):
+                    self._geo_reader = geoip2.database.Reader(p)
+                    return self._geo_reader
+        except Exception:
+            self._geo_reader = None
+        return None
+
+    def _resolve_ip_to_location(self, ip: str):
+        # Return dict with city/country/latitude/longitude if possible, else None
+        if not ip or ip == 'unknown':
+            return None
+        if ip in self._ip_lookup_cache:
+            return self._ip_lookup_cache[ip]
+        reader = self._init_geo_reader()
+        if not reader:
+            # no geoip available
+            self._ip_lookup_cache[ip] = None
+            return None
+        try:
+            resp = reader.city(ip)
+            city = resp.city.name if resp.city and resp.city.name else None
+            country = resp.country.name if resp.country and resp.country.name else None
+            subdivision = None
+            if resp.subdivisions and len(resp.subdivisions) > 0:
+                subdivision = resp.subdivisions[0].name
+            lat = resp.location.latitude if resp.location else None
+            lon = resp.location.longitude if resp.location else None
+            info = {}
+            if city:
+                info['city'] = city
+            if subdivision:
+                info['region'] = subdivision
+            if country:
+                info['country'] = country
+            if lat is not None and lon is not None:
+                info['latitude'] = lat
+                info['longitude'] = lon
+            # cache even if empty dict to avoid repeated lookups
+            self._ip_lookup_cache[ip] = info or None
+            return self._ip_lookup_cache[ip]
+        except Exception:
+            self._ip_lookup_cache[ip] = None
+            return None
 
     # Record a click event and increment counters. Attempts to enrich with rank/position if available
     def record_click(self, pid: str, search_id: int = None, user_agent: str = None, remote_addr: str = None, timestamp=None):
