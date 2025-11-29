@@ -132,7 +132,13 @@ def doc_details():
     # Record the click via analytics helper (captures user agent and IP)
     search_id = request.args.get('search_id')
     user_agent = request.headers.get('User-Agent')
-    remote_addr = request.remote_addr
+    # Prefer X-Forwarded-For (useful for simulating client IPs)
+    xf = request.headers.get('X-Forwarded-For')
+    if xf:
+        remote_addr = xf.split(',')[0].strip()
+    else:
+        remote_addr = request.remote_addr
+    print(f"Recording click. remote_addr chosen for analytics: {remote_addr}")
     try:
         analytics_data.record_click(clicked_doc_id, search_id=int(search_id) if search_id else None,
                                     user_agent=user_agent, remote_addr=remote_addr)

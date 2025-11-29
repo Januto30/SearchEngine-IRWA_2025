@@ -165,12 +165,14 @@ class AnalyticsData:
             subdivision = None
             if resp.subdivisions and len(resp.subdivisions) > 0:
                 subdivision = resp.subdivisions[0].name
+            # Fallback: if no explicit city, prefer subdivision (region) as a sensible label
+            display_city = city or subdivision or None
             lat = resp.location.latitude if resp.location else None
             lon = resp.location.longitude if resp.location else None
             info = {}
-            if city:
-                info['city'] = city
-            if subdivision:
+            if display_city:
+                info['city'] = display_city
+            if subdivision and subdivision != display_city:
                 info['region'] = subdivision
             if country:
                 info['country'] = country
