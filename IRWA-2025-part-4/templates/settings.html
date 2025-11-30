@@ -2,22 +2,72 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Settings</title>
     <link rel="stylesheet" href="/static/styles/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/styles/custom.css">
+    <style>
+      /* Small, self-contained tweaks to keep this change local and safe */
+      :root{ --accent-1: #df8c95; --accent-2: #c96b75; --text-dark: #2f2e2e; }
+      .settings-card { max-width: 720px; }
+      .muted-help { color: #6c757d; font-size: 0.9rem; }
+      .btn-save { min-width: 110px; }
+
+      /* Accent strip on top of the card to match other pages */
+      .accent-strip{ height:6px; border-top-left-radius: .5rem; border-top-right-radius: .5rem; background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); }
+
+      /* Gradient primary button matching product badges */
+      .btn-primary-gradient{
+        background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+        color: var(--text-dark);
+        border-radius: 30px;
+        padding: 10px 20px;
+        font-weight: 600;
+        box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+        border: none;
+      }
+
+      .btn-primary-gradient:hover{ filter: brightness(0.98); transform: translateY(-1px); }
+    </style>
   </head>
-  <body class="container mt-4">
-    <h2>Settings</h2>
-    <form method="post">
-      <div class="form-group">
-        <label for="ranking_method">Ranking method</label>
-        <select id="ranking_method" name="ranking_method" class="form-control">
-          <option value="tfidf" {% if current_method == 'tfidf' %}selected{% endif %}>TF-IDF (cosine)</option>
-          <option value="bm25" {% if current_method == 'bm25' %}selected{% endif %}>BM25</option>
-          <option value="our" {% if current_method == 'our' %}selected{% endif %}>Custom (BM25 + feature boosts)</option>
-        </select>
+  <body class="bg-light">
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+          <div class="card shadow-sm settings-card">
+            <div class="accent-strip"></div>
+            <div class="card-header bg-white">
+              <h3 class="mb-0">Settings</h3>
+              <small class="text-muted">Adjust ranking preferences for search results</small>
+            </div>
+            <form method="post" class="card-body">
+              <div class="mb-4">
+                <label for="ranking_method" class="form-label fw-semibold">Ranking method</label>
+                <select id="ranking_method" name="ranking_method" class="form-select form-select-lg">
+                  <option value="tfidf" {% if current_method == 'tfidf' %}selected{% endif %}>TF-IDF (cosine)</option>
+                  <option value="bm25" {% if current_method == 'bm25' %}selected{% endif %}>BM25</option>
+                  <option value="our" {% if current_method == 'our' %}selected{% endif %}>Custom (BM25 + feature boosts)</option>
+                </select>
+                <div class="mt-2 muted-help">TF-IDF is fast and interpretable.<br> BM25 is more robust for short queries.<br> Use Custom for feature-boosted ranking.</div>
+              </div>
+
+              <!-- Placeholder for future settings; keeps layout consistent if new options are added -->
+              <div class="mb-4">
+                <label class="form-label fw-semibold">Appearance</label>
+                <div class="form-text muted-help">This page controls search ranking only appearance settings are global.</div>
+              </div>
+
+              <div class="d-flex gap-2 justify-content-end">
+                <a class="btn btn-outline-secondary" href="/">Cancel</a>
+                <button class="btn-primary-gradient btn-save" type="submit">Save</button>
+              </div>
+            </form>
+            <div class="card-footer text-muted small">
+              Settings saved to session for this demo app — changes affect subsequent searches.
+            </div>
+          </div>
+        </div>
       </div>
-      <button class="btn btn-primary mt-3" type="submit">Save</button>
-      <a class="btn btn-secondary mt-3" href="/">Back</a>
-    </form>
+    </div>
   </body>
 </html>

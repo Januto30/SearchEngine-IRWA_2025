@@ -10,7 +10,6 @@ from myapp.search.load_corpus import load_corpus
 from myapp.search.objects import Document, StatsDocument
 from myapp.search.search_engine import SearchEngine
 from myapp.generation.rag import RAGGenerator
-#from myapp.generation.rag_improved import RAGGenerator
 
 from dotenv import load_dotenv
 load_dotenv()  # take environment variables from .env
@@ -35,7 +34,7 @@ app.session_cookie_name = os.getenv("SESSION_COOKIE_NAME")
 search_engine = SearchEngine()
 # instantiate our in memory persistence
 analytics_data = AnalyticsData()
-# instantiate RAG generator
+# instantiate the baseline RAG generator (keep `rag.py` unchanged)
 rag_generator = RAGGenerator()
 
 # load documents corpus into memory.
@@ -87,7 +86,12 @@ def search_form_post():
         print(f"Warning: could not save search results for analytics: {e}")
 
     # generate RAG response based on user query and retrieved results
-    rag_response = rag_generator.generate_response(search_query, results)
+    # Use the baseline RAG implementation from `rag.py`
+    try:
+        rag_response = rag_generator.generate_response(search_query, results)
+    except Exception as e:
+        print(f"RAG generation error: {e}")
+        rag_response = "RAG is not available. Check your credentials (.env file) or account limits."
     print("RAG response:", rag_response)
 
     # Support both legacy string response and new structured dict response
