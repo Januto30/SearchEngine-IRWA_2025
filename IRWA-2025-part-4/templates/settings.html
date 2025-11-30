@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Settings</title>
+    <link rel="stylesheet" href="/static/styles/bootstrap.min.css">
+  </head>
+  <body class="container mt-4">
+    <h2>Settings</h2>
+    <form method="post">
+      <div class="form-group">
+        <label for="ranking_method">Ranking method</label>
+        <select id="ranking_method" name="ranking_method" class="form-control">
+          <option value="tfidf" {% if current_method == 'tfidf' %}selected{% endif %}>TF-IDF (cosine)</option>
+          <option value="bm25" {% if current_method == 'bm25' %}selected{% endif %}>BM25</option>
+          <option value="our" {% if current_method == 'our' %}selected{% endif %}>Custom (BM25 + feature boosts)</option>
+        </select>
+      </div>
+      <button class="btn btn-primary mt-3" type="submit">Save</button>
+      <a class="btn btn-secondary mt-3" href="/">Back</a>
+    </form>
+  </body>
+</html>

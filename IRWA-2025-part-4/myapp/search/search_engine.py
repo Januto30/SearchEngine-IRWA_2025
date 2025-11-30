@@ -40,15 +40,17 @@ class SearchEngine:
             return dummy_search(corpus, search_id, num_results=num_results)
 
         # use the single teacher-facing entrypoint that builds/caches the TF-IDF index
-        if backend == 'tfidf':
+        # Support multiple ranking backends: 'tfidf', 'bm25', 'our', 'dummy'
+        if backend in ('tfidf', 'bm25', 'our', 'custom'):
             try:
-                ranked = algorithms.search_in_corpus(search_query, corpus, top_k=num_results)
+                ranked = algorithms.search_in_corpus(search_query, corpus, top_k=num_results, method=backend)
             except Exception as e:
-                print(f"Error during TF-IDF search via search_in_corpus: {e}")
+                print(f"Error during search via search_in_corpus (backend={backend}): {e}")
                 return dummy_search(corpus, search_id, num_results=num_results)
 
             results = []
             for pid, score in ranked:
+                # ensure pid maps to actual document pid keys
                 if pid not in corpus:
                     continue
                 doc = corpus[pid]
