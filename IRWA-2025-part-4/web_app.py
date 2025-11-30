@@ -10,6 +10,11 @@ from myapp.search.load_corpus import load_corpus
 from myapp.search.objects import Document, StatsDocument
 from myapp.search.search_engine import SearchEngine
 from myapp.generation.rag import RAGGenerator
+# enhanced RAG (optional - wired from settings)
+try:
+    from myapp.generation.rag_enhanced import RAGEnhancedGenerator
+except Exception:
+    RAGEnhancedGenerator = None
 
 from dotenv import load_dotenv
 load_dotenv()  # take environment variables from .env
@@ -36,6 +41,8 @@ search_engine = SearchEngine()
 analytics_data = AnalyticsData()
 # instantiate the baseline RAG generator (keep `rag.py` unchanged)
 rag_generator = RAGGenerator()
+# instantiate enhanced generator if available (do not force its usage)
+rag_enhanced = RAGEnhancedGenerator() if RAGEnhancedGenerator is not None else None
 
 # load documents corpus into memory.
 full_path = os.path.realpath(__file__)
@@ -86,21 +93,50 @@ def search_form_post():
         print(f"Warning: could not save search results for analytics: {e}")
 
     # generate RAG response based on user query and retrieved results
-    # Use the baseline RAG implementation from `rag.py`
+    # Decide which RAG implementation to use based on user settings
+    rag_choice = session.get('rag_impl', 'baseline')
+    rag_reranked = None
+    rag_text = None
     try:
-        rag_response = rag_generator.generate_response(search_query, results)
+        if rag_choice == 'enhanced' and rag_enhanced is not None:
+            # prepare richer retrieved_results for the enhanced RAG
+            enriched = []
+            for idx, item in enumerate(results, start=1):
+                pid = item.pid
+                doc = corpus.get(pid)
+                enriched.append({
+                    'rank': idx,
+                    'pid': pid,
+                    'title': item.title,
+                    'description': item.description,
+                    'score': float(item.ranking) if item.ranking is not None else None,
+                    'price': float(getattr(doc, 'selling_price', 0) or 0) if doc else None,
+                    'rating': float(getattr(doc, 'average_rating', 0) or 0) if doc else None,
+                    'discount': float(getattr(doc, 'discount', 0) or 0) if doc else None,
+                })
+
+            rag_response = rag_enhanced.generate_response(search_query, enriched, top_N=10, mode='augment')
+            # Format structured response into text for the template
+            if isinstance(rag_response, dict):
+                if rag_response.get('best_pid'):
+                    bp = rag_response.get('best_pid')
+                    why = rag_response.get('why', '')
+                    alt = rag_response.get('alternative', '')
+                    rag_text = f"- Best Product: {bp}\n- Why: {why}"
+                    if alt:
+                        rag_text += f"\n- Alternative: {alt}"
+                else:
+                    rag_text = rag_response.get('why') or 'No recommended product from RAG.'
+            else:
+                rag_text = str(rag_response)
+        else:
+            # baseline behavior
+            rag_response = rag_generator.generate_response(search_query, results)
+            rag_text = rag_response
     except Exception as e:
         print(f"RAG generation error: {e}")
         rag_response = "RAG is not available. Check your credentials (.env file) or account limits."
-    print("RAG response:", rag_response)
-
-    # Support both legacy string response and new structured dict response
-    if isinstance(rag_response, dict):
-        rag_text = rag_response.get('answer')
-        rag_reranked = rag_response.get('reranked_results')
-    else:
         rag_text = rag_response
-        rag_reranked = None
 
     found_count = len(results)
     session['last_found_count'] = found_count
@@ -125,8 +161,12 @@ def settings():
     if request.method == 'POST':
         method = request.form.get('ranking_method', 'tfidf')
         session['ranking_method'] = method
+        # also save selected RAG implementation
+        rag_impl = request.form.get('rag_impl', 'baseline')
+        session['rag_impl'] = rag_impl
     current = session.get('ranking_method', 'tfidf')
-    return render_template('settings.html', current_method=current)
+    current_rag = session.get('rag_impl', 'baseline')
+    return render_template('settings.html', current_method=current, current_rag=current_rag)
 
 
 @app.route('/doc_details', methods=['GET'])

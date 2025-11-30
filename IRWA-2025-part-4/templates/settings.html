@@ -51,6 +51,15 @@
                 <div class="mt-2 muted-help">TF-IDF is fast and interpretable.<br> BM25 is more robust for short queries.<br> Use Custom for feature-boosted ranking.</div>
               </div>
 
+              <div class="mb-4">
+                <label for="rag_impl" class="form-label fw-semibold">RAG Implementation</label>
+                <select id="rag_impl" name="rag_impl" class="form-select">
+                  <option value="baseline" {% if current_rag == 'baseline' %}selected{% endif %}>Baseline (original `rag.py`)</option>
+                  <option value="enhanced" {% if current_rag == 'enhanced' %}selected{% endif %}>Enhanced (structured + validated)</option>
+                </select>
+                <div class="mt-2 muted-help">Choose `Enhanced` to include ranking, price and rating signals when generating the AI recommendation. Use `Baseline` to keep the original behavior.</div>
+              </div>
+
               <!-- Placeholder for future settings; keeps layout consistent if new options are added -->
               <div class="mb-4">
                 <label class="form-label fw-semibold">Appearance</label>
@@ -58,7 +67,7 @@
               </div>
 
               <div class="d-flex gap-2 justify-content-end">
-                <a class="btn btn-outline-secondary" href="/">Cancel</a>
+                <a class="btn btn-outline-secondary" href="/">Back </a>
                 <button class="btn-primary-gradient btn-save" type="submit">Save</button>
               </div>
             </form>

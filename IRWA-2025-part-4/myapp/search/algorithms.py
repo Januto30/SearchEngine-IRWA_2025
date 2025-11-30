@@ -263,14 +263,27 @@ def bm25_search(query, index, tf, idf_bm25, doc_len, avgdl, pid_map=None, top_k=
     if not query_terms:
         return []
 
-    # conjunctive AND semantics
-    doc_sets = []
+    # Prefer conjunctive AND semantics, but fall back to union of available term postings
+    term_postings = []
     for term in query_terms:
         if term in index:
-            doc_sets.append(set([posting[0] for posting in index[term]]))
+            term_postings.append(set([posting[0] for posting in index[term]]))
         else:
-            return []
-    matching_docs = set.intersection(*doc_sets)
+            # skip missing terms (do not abort immediately)
+            continue
+
+    if not term_postings:
+        return []
+
+    # If all query terms are present, use intersection; otherwise use union
+    if len(term_postings) == len(query_terms):
+        matching_docs = set.intersection(*term_postings)
+        if not matching_docs:
+            # empty intersection -> fall back to union
+            matching_docs = set.union(*term_postings)
+    else:
+        matching_docs = set.union(*term_postings)
+
     if not matching_docs:
         return []
 
@@ -405,14 +418,25 @@ def search_in_corpus(query: str, corpus: dict, top_k: int = 20, method: str = 't
         if not q_terms:
             return []
         doc_sets = []
+        # collect term postings, but do not abort when a term is missing
         for term in q_terms:
             if term in _cached_index:
                 doc_sets.append(set([posting[0] for posting in _cached_index[term]]))
             else:
-                return []
-        matching_docs = set.intersection(*doc_sets)
-        if not matching_docs:
+                # skip missing terms to allow partial matches (union fallback)
+                continue
+        # if no term postings found at all, return empty
+        if not doc_sets:
             return []
+
+        # If all query terms were present, prefer strict conjunctive match,
+        # but fall back to union if the intersection is empty. Otherwise use union.
+        if len(doc_sets) == len(q_terms):
+            matching_docs = set.intersection(*doc_sets)
+            if not matching_docs:
+                matching_docs = set.union(*doc_sets)
+        else:
+            matching_docs = set.union(*doc_sets)
         ranked = score_custom_for_docs(q_terms, _cached_index, matching_docs, _cached_idf_bm25, _cached_doc_len, _cached_avgdl, corpus)
         # ranked is list of (doc_id, score)
         return ranked[:top_k]
