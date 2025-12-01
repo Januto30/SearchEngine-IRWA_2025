@@ -2,7 +2,7 @@
 
 **Repository:** [SearchEngine-IRWA_2025](https://github.com/yourusername/SearchEngine-IRWA_2025)  
 **Course:** Information Retrieval and Web Analytics (IRWA) – 2025  
-**Environment:**
+**Environments:**
 - Part 1/2/3: Google Colab (Python 3)
 - Part 4: Visual Studio Code (Python 3)
 
@@ -46,37 +46,9 @@ SearchEngine-IRWA_2025/
 ├── IRWA-2025-part-4/
 │ ├── IRWA-2025-u214970-u213927-u214026-part-4.pdf
 │ ├── myapp/
-│   ├──  analytics/
-│      └──  analytics_data.py
-│   ├──  core/
-│      └──  utils.py
-│   ├──  generation/
-│      ├──  rag.py
-│      └──  rag_enhanced.py
-│   └──  search/
-│      ├──  algorithms.py
-│      ├──  load_corpus.py
-│      ├──  objects.py
-│      └──  search_engine.py
 │ ├── project_progress/
-│   ├──  part_1/
-│   ├──  part_2/
-│   └──  part_3/
 │ ├── static/
-│   ├──  styles/
-│      ├──  bootstrap.min.css
-│      ├──  bootstrap.min.css.map
-│      └──  custom.css
-│   ├──  image.png
-│   └──  logo.png
 │ ├── templates/
-│   ├──  base.html
-│   ├──  dashboard.html
-│   ├──  doc_details.html
-│   ├──  index.html
-│   ├──  results.html
-│   ├──  settings.html
-│   └──  stats.html
 │ ├── .gitignore
 │ ├── LICENSE
 │ ├── README.md
@@ -185,4 +157,5 @@ A Web application for entering the search query, displaying the search results, 
 - Jan Prats
 
 ---
+
 
