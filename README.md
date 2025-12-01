@@ -2,7 +2,9 @@
 
 **Repository:** [SearchEngine-IRWA_2025](https://github.com/yourusername/SearchEngine-IRWA_2025)  
 **Course:** Information Retrieval and Web Analytics (IRWA) – 2025  
-**Environment:** Google Colab (Python 3)
+**Environment:**
+- Part 1/2/3: Google Colab (Python 3)
+- Part 4: Visual Studio Code (Python 3)
 
 ## Project Overview:
 This repository contains the implementation of the **IRWA 2025 Final Project**, an incremental development of a **Retrieval-Augmented Generation (RAG)** system.  
@@ -13,9 +15,9 @@ The objective is to build a **custom search engine** implementing different text
 | 1 | Text Processing & Exploratory Data Analysis | 24/10/2025 |
 | 2 | Indexing & Evaluation | 02/11/2025 |
 | 3 | Ranking & Filtering | 20/11/2025 |
-| 4 | RAG, User Interface & Web Analytics | 29/11/2025 |
+| 4 | RAG, User Interface & Web Analytics | 04/12/2025 |
 
-Each part is developed in a separate Jupyter notebook (in Python3), tagged in GitHub as `IRWA-2025-part-N`.
+All parts are implemented in a Jupyter notebook (Python3), tagged in GitHub as `IRWA-2025-part-N`, while Part 4 is developed separately in Visual Studio Code using Python and the Flask web framework.
 
 ---
 
@@ -41,14 +43,52 @@ SearchEngine-IRWA_2025/
 │ └── data/
 │   ├──  fashion_products_dataset.json
 │   └──  validation_labels.csv
-├── IRWA-2025-part-4/  #to be implemented
+├── IRWA-2025-part-4/
+│ ├── IRWA-2025-u214970-u213927-u214026-part-4.pdf
+│ ├── myapp/
+│   ├──  analytics/
+│      └──  analytics_data.py
+│   ├──  core/
+│      └──  utils.py
+│   ├──  generation/
+│      ├──  rag.py
+│      └──  rag_enhanced.py
+│   └──  search/
+│      ├──  algorithms.py
+│      ├──  load_corpus.py
+│      ├──  objects.py
+│      └──  search_engine.py
+│ ├── project_progress/
+│   ├──  part_1/
+│   ├──  part_2/
+│   └──  part_3/
+│ ├── static/
+│   ├──  styles/
+│      ├──  bootstrap.min.css
+│      ├──  bootstrap.min.css.map
+│      └──  custom.css
+│   ├──  image.png
+│   └──  logo.png
+│ ├── templates/
+│   ├──  base.html
+│   ├──  dashboard.html
+│   ├──  doc_details.html
+│   ├──  index.html
+│   ├──  results.html
+│   ├──  settings.html
+│   └──  stats.html
+│ ├── .gitignore
+│ ├── LICENSE
+│ ├── README.md
+│ ├── requirements.txt
+│ └── web_app.py
 │
 └── README.md
 ```
 
 ---
 
-## 🚀 How to Run on Google Colab
+## 🚀 How to Run on Google Colab (applicable for Part 1/2/3)
 
 All notebooks are designed for **Google Colab**, so no local setup is required.
 
@@ -119,7 +159,20 @@ Top-k ranked documents per query, precision and recall metrics, and a comparison
 
 ---
 
-## 📒 Part 4 – RAG, User Interface & Web Analytics *(to be added)*
+## 📒 Part 4 – RAG, User Interface & Web Analytics
+
+**Objective:**
+Give our search engine a user interface (UI) and apply some web analytics to it.
+
+**Main Steps:**
+- Extend the provided Flask web application with a proper search page, results page, and document details view.
+- Connect the UI to a unified search() function that calls the optimized ranking algorithms.
+- Enhance the baseline RAG component with improved prompts, metadata usage, and LLM-based result summarization.
+- Add analytics tracking for queries, clicks, sessions, dwell time, and user context.
+- Store analytics data in memory using a simple schema and present insights in an analytics dashboard.
+
+**Output:**
+A Web application for entering the search query, displaying the search results, and collecting usage statistics.
 
 ---
 
@@ -132,3 +185,4 @@ Top-k ranked documents per query, precision and recall metrics, and a comparison
 - Jan Prats
 
 ---
+
