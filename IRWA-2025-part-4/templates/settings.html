@@ -1,82 +1,150 @@
 <!doctype html>
-<html>
-  <head>
+<html lang="en">
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Settings</title>
+    <title>Settings - IRWA Search Engine</title>
     <link rel="stylesheet" href="/static/styles/bootstrap.min.css">
     <link rel="stylesheet" href="/static/styles/custom.css">
+    
     <style>
-      /* Small, self-contained tweaks to keep this change local and safe */
-      :root{ --accent-1: #df8c95; --accent-2: #c96b75; --text-dark: #2f2e2e; }
-      .settings-card { max-width: 720px; }
-      .muted-help { color: #6c757d; font-size: 0.9rem; }
-      .btn-save { min-width: 110px; }
+        /* Estils globals del base.html */
+        :root{ --accent-1: #df8c95; --accent-2: #c96b75; --text-dark: #2f2e2e; }
 
-      /* Accent strip on top of the card to match other pages */
-      .accent-strip{ height:6px; border-top-left-radius: .5rem; border-top-right-radius: .5rem; background: linear-gradient(135deg, var(--accent-1), var(--accent-2)); }
+        body {
+            /* Fons gradient del base.html */
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-      /* Gradient primary button matching product badges */
-      .btn-primary-gradient{
-        background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-        color: var(--text-dark);
-        border-radius: 30px;
-        padding: 10px 20px;
-        font-weight: 600;
-        box-shadow: 0 6px 14px rgba(0,0,0,0.12);
-        border: none;
-      }
+        .settings-container {
+            /* Estils del contenidor del base.html (cantonades, ombra, fons) */
+            background: #ffffff;
+            padding: 40px 50px;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 650px; /* Ajustat per a una pantalla de configuració */
+            width: 100%;
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+        
+        /* Estils de l'encapçalament (copiats de la plantilla base) */
+        .header h3 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+        .header small {
+            display: block;
+            color: #64748b;
+        }
 
-      .btn-primary-gradient:hover{ filter: brightness(0.98); transform: translateY(-1px); }
+        /* Utilitats */
+        .muted-help { color: #6c757d; font-size: 0.9rem; }
+        .btn-save { min-width: 110px; }
+
+        /* Gradient primary button matching product badges */
+        .btn-primary-gradient{
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: #fff; /* Canviat a blanc per millorar la llegibilitat sobre el degradat */
+            border-radius: 30px;
+            padding: 10px 20px;
+            font-weight: 600;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+            border: none;
+            transition: all 0.25s ease;
+        }
+
+        .btn-primary-gradient:hover{ filter: brightness(0.98); transform: translateY(-1px); }
+
+        /* Estil per al botó "Back" utilitzant el mateix estil gradient, però invertint els colors per ser secundari */
+        .btn-outline-accent {
+            background: transparent;
+            margin-right: 10px;
+            color: var(--accent-2);
+            border: 2px solid var(--accent-2);
+            border-radius: 30px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.25s ease;
+        }
+        .btn-outline-accent:hover {
+            background: var(--accent-1);
+            color: #fff;
+            border-color: var(--accent-1);
+            transform: translateY(-1px);
+        }
+        
+        /* Separador (copiat de la plantilla base) */
+        hr {
+            margin: 40px 0 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .centered {
+            font-size: 0.95rem;
+            color: #64748b;
+            margin-top: 10px;
+            letter-spacing: 0.4px;
+        }
     </style>
-  </head>
-  <body class="bg-light">
-    <div class="container py-5">
-      <div class="row justify-content-center">
-        <div class="col-12 col-md-10 col-lg-8">
-          <div class="card shadow-sm settings-card">
-            <div class="accent-strip"></div>
-            <div class="card-header bg-white">
-              <h3 class="mb-0">Settings</h3>
-              <small class="text-muted">Adjust ranking preferences for search results</small>
-            </div>
-            <form method="post" class="card-body">
-              <div class="mb-4">
+</head>
+<body>
+    <div class="settings-container">
+        
+        <div class="header text-center">
+            <a href="/">
+                </a>
+            <h3 class="mb-0">Settings</h3>
+            <small class="text-muted">Adjust ranking preferences for search results</small>
+        </div>
+
+        <hr>
+
+        <form method="post" class="content">
+            <div class="mb-4">
                 <label for="ranking_method" class="form-label fw-semibold">Ranking method</label>
                 <select id="ranking_method" name="ranking_method" class="form-select form-select-lg">
-                  <option value="tfidf" {% if current_method == 'tfidf' %}selected{% endif %}>TF-IDF (cosine)</option>
-                  <option value="bm25" {% if current_method == 'bm25' %}selected{% endif %}>BM25</option>
-                  <option value="our" {% if current_method == 'our' %}selected{% endif %}>Custom (BM25 + feature boosts)</option>
+                    <option value="tfidf" {% if current_method == 'tfidf' %}selected{% endif %}>TF-IDF (cosine)</option>
+                    <option value="bm25" {% if current_method == 'bm25' %}selected{% endif %}>BM25</option>
+                    <option value="our" {% if current_method == 'our' %}selected{% endif %}>Custom (BM25 + feature boosts)</option>
                 </select>
                 <div class="mt-2 muted-help">TF-IDF is fast and interpretable.<br> BM25 is more robust for short queries.<br> Use Custom for feature-boosted ranking.</div>
-              </div>
+            </div>
 
-              <div class="mb-4">
+            <div class="mb-4">
                 <label for="rag_impl" class="form-label fw-semibold">RAG Implementation</label>
                 <select id="rag_impl" name="rag_impl" class="form-select">
-                  <option value="baseline" {% if current_rag == 'baseline' %}selected{% endif %}>Baseline (original `rag.py`)</option>
-                  <option value="enhanced" {% if current_rag == 'enhanced' %}selected{% endif %}>Enhanced (structured + validated)</option>
+                    <option value="baseline" {% if current_rag == 'baseline' %}selected{% endif %}>Baseline (original `rag.py`)</option>
+                    <option value="enhanced" {% if current_rag == 'enhanced' %}selected{% endif %}>Enhanced (structured + validated)</option>
                 </select>
                 <div class="mt-2 muted-help">Choose `Enhanced` to include ranking, price and rating signals when generating the AI recommendation. Use `Baseline` to keep the original behavior.</div>
-              </div>
+            </div>
 
-              <!-- Placeholder for future settings; keeps layout consistent if new options are added -->
-              <div class="mb-4">
+            <div class="mb-4">
                 <label class="form-label fw-semibold">Appearance</label>
                 <div class="form-text muted-help">This page controls search ranking only appearance settings are global.</div>
-              </div>
-
-              <div class="d-flex gap-2 justify-content-end">
-                <a class="btn btn-outline-secondary" href="/">Back </a>
-                <button class="btn-primary-gradient btn-save" type="submit">Save</button>
-              </div>
-            </form>
-            <div class="card-footer text-muted small">
-              Settings saved to session for this demo app — changes affect subsequent searches.
             </div>
-          </div>
+
+            <div class="d-flex gap-2 justify-content-end pt-3">
+                <a class="btn btn-outline-accent" href="/">Back</a> 
+                <button class="btn-primary-gradient btn-save" type="submit">Save</button>
+            </div>
+        </form>
+
+        <hr>
+        
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="centered">Settings saved to session for this demo app — changes affect subsequent searches.</div>
         </div>
-      </div>
     </div>
-  </body>
+</body>
 </html>
