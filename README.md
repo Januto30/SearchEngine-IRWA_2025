@@ -137,7 +137,7 @@ Top-k ranked documents per query, precision and recall metrics, and a comparison
 Give our search engine a user interface (UI) and apply some web analytics to it.
 
 **Main Steps:**
-- Extend the provided Flask web application with a proper search page, results page, and document details view.
+- Extend the provided Flask web framework with a proper search page, results page, and document details view.
 - Connect the UI to a unified search() function that calls the optimized ranking algorithms.
 - Enhance the baseline RAG component with improved prompts, metadata usage, and LLM-based result summarization.
 - Add analytics tracking for queries, clicks, sessions, dwell time, and user context.
@@ -157,5 +157,6 @@ A Web application for entering the search query, displaying the search results, 
 - Jan Prats
 
 ---
+
 
 
