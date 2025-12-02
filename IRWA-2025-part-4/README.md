@@ -162,8 +162,8 @@ pip install geoip2
 ```
 
 1. Download the GeoLite2 database from MaxMind:
-  1) Sign up for MaxMind (a free account is required).
-  2) Download the GeoLite2-City_20251128.tar and .sha256 files.
+  1.1) Sign up for MaxMind (a free account is required).
+  1.2) Download the GeoLite2-City_20251128.tar and .sha256 files.
 
 2. Upload this file in the folder `IRWA-2025-part-4` and inspect the file type (see if it's a valid tar file or HTML)
 ```
@@ -239,7 +239,7 @@ from web_app import corpus
 # print the first 5 ids
 print(list(corpus.keys())[:5])
 PY
-```⁠
+```
 Copy one of those IDs to use in the next request.
 
 9. Simulate a request from a public IP address using X-Forwarded-For (example with 8.8.8.8), replacing <PID> with a real ID:
@@ -254,4 +254,5 @@ curl -s http://127.0.0.1:8088/analytics/ips | jq .
 ```⁠⁠
 
 **Note: When you test locally (127.0.0.1:8088 or 192.168.xx.xx:8088, private addresses) the geoip may not return city, that's normal.**
+
 
