@@ -6,8 +6,8 @@
       <img src="project_progress/image.png" alt="Project Logo"/>
     </td>
     <td style="vertical-align: top;">
-      This repository contains the template code for the IRWA Final Project - Search Engine with Web Analytics.
-      The project is implemented using Python and the Flask web framework. It includes a simple web application that allows users to search through a collection of documents and view analytics about their searches.
+      This repository contains the code for the IRWA Final Project - Search Engine with Web Analytics.
+      The project is implemented using Python and the Flask web framework. It includes a web application that allows users to search through a collection of documents and view analytics about their searches.
     </td>
   </tr>
 </table>
@@ -25,7 +25,7 @@
 │ ├──  generation/
 │   ├──  rag.py
 │   └──  rag_enhanced.py
-│ ├──  search/
+│ └──  search/
 │   ├──  algorithms.py
 │   ├──  load_corpus.py
 │   ├──  objects.py
@@ -162,59 +162,47 @@ pip install geoip2
 ```
 
 1. Download the GeoLite2 database from MaxMind:
-   1.1. Sign up for MaxMind (a free account is required).
-   1.2. Download the GeoLite2-City_20251128.tar and .sha256 files.
+  1) Sign up for MaxMind (a free account is required).
+  2) Download the GeoLite2-City_20251128.tar and .sha256 files.
 
 2. Upload this file in the folder `IRWA-2025-part-4` and inspect the file type (see if it's a valid tar file or HTML)
 ```
 file GeoLite2-City_20251128.tar
-```
-(Optional) View first bytes to detect HTML if something is wrong
-```
+# (Optional) View first bytes to detect HTML if something is wrong
 hexdump -C GeoLite2-City_20251128.tar | head -n 20
 ```
-• If the file displays "POSIX tar archive", you're fine and can extract.
-• If it displays "HTML" or "ASCII text", it means the download was from a login/error page.
+- If the file displays "POSIX tar archive", you're fine and can extract.
+- If it displays "HTML" or "ASCII text", it means the download was from a login/error page.
 
 3. To check the hash of the .tar file:
 ```
 shasum -a 256 GeoLite2-City_20251128.tar
-```
-and manually compare with the contents of GeoLite2-City_20251128.tar.gz.sha256 if applicable
-```
+# and manually compare with the contents of GeoLite2-City_20251128.tar.gz.sha256 if applicable
 cat GeoLite2-City_20251128.tar.gz.sha256 2>/dev/null || true
 ```
 
 4. Extract the .tar ⁠ (if ⁠file said is tar)
 ```
 tar -xf GeoLite2-City_20251128.tar
-```
-for listing the extract files
-```
+# for listing the extract files
 ls -l
-```
-search the .mmdb inside the extracted subdirectory
-```
+# search the .mmdb inside the extracted subdirectory
 find . -maxdepth 3 -type f -name "GeoLite2-City.mmdb" -print
 ```
 
 5. Move the⁠ .mmdb ⁠to the root of the project. There are two options for doing so:
-   5.1. Manually, arrastrando el fichero desde la carpeta en la que se encuentra hasta la deseada.
-   5.2.
-   Supposing find returned ./GeoLite2-City_20251128/GeoLite2-City.mmdb
-   ```
-   mv ./GeoLite2-City_20251128/GeoLite2-City.mmdb ./GeoLite2-City.mmdb
-   ```
+- Manually, arrastrando el fichero desde la carpeta en la que se encuentra hasta la deseada.
+- Supposing find returned ./GeoLite2-City_20251128/GeoLite2-City.mmdb
+```
+mv ./GeoLite2-City_20251128/GeoLite2-City.mmdb ./GeoLite2-City.mmdb
+```
 **Note: This file is already added to .gitignore for not versioning the DB.**
 
 6. Set the environment variable for the app (temporary and persistent)
-⁠ zsh
-- temporal (valid only on this terminal)
 ```
+# temporal (valid only on this terminal)
 export GEOIP_DB_PATH="$(pwd)/GeoLite2-City.mmdb"
-```
-- persistent in zsh (add it to ~/.zshrc)
-```
+# persistent in zsh (add it to ~/.zshrc)
 echo 'export GEOIP_DB_PATH="$(pwd)/GeoLite2-City.mmdb"' >> ~/.zshrc
 source ~/.zshrc
 ```
@@ -224,6 +212,7 @@ cp ~/.zshrc ~/.zshrc.backup
 echo 'export GEOIP_DB_PATH="/path/to/your/GeoLite2-City.mmdb"' | sudo tee -a ~/.zshrc
 grep -n GEOIP_DB_PATH ~/.zshrc || true
 ```
+**Note: It will ask for a password. Introduce the password you use to log in in your computer.**
 Reload zshrc in this terminal and display the variable
 ```
 source ~/.zshrc
@@ -231,8 +220,38 @@ printf "GEOIP_DB_PATH=%s\n" "$GEOIP_DB_PATH"
 ls -l ~/.zshrc
 ```
 
+7. Make sure that the server is running with the version of the code that contains the X-Forwarded-For read.
+```
+# Make sure that you are within the virtual environment (if not run the following line)
+source irwa_venv/bin/activate
+```
+```
+export FLASK_APP=web_app.py
+flask run --host=127.0.0.1 --port=8088
+```
 
+8. Open a new terminal to obtain a valid PID from the corpus to use in the test.
+```
+cd <your projects root directory>
+source irwa_venv/bin/activate
+python - <<'PY'
+from web_app import corpus
+# print the first 5 ids
+print(list(corpus.keys())[:5])
+PY
+```⁠
+Copy one of those IDs to use in the next request.
 
+9. Simulate a request from a public IP address using X-Forwarded-For (example with 8.8.8.8), replacing <PID> with a real ID:
+```⁠
+curl -v -H "X-Forwarded-For: 8.8.8.8" "http://127.0.0.1:8088/doc_details?pid=<PID>"
+```⁠
+Look at the terminal where Flask is running, you should see the line we added: Recording click. remote_addr chosen for analytics: 8.8.8.8
 
+10. Check the analytics endpoint to see the GeoIP resolution:
+```⁠
+curl -s http://127.0.0.1:8088/analytics/ips | jq .
+```⁠⁠
 
 **Note: When you test locally (127.0.0.1:8088 or 192.168.xx.xx:8088, private addresses) the geoip may not return city, that's normal.**
+
